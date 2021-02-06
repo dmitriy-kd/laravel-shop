@@ -42,6 +42,10 @@ return [
     */
 
     'disks' => [
+        'reset' => [//создание нового "диска" использование показано в ResetController
+            'driver' => 'local',
+            'root' => base_path('resources/images') //хелпер(функция) возвращает путь от рута
+        ],
 
         'local' => [
             'driver' => 'local',
