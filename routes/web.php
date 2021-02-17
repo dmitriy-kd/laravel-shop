@@ -54,8 +54,10 @@ Route::get('/categories', 'MainController@categories')->name('categories');
 Route::get('/card/{card}', 'MainController@card')->name('card');
 
 Route::group(['prefix' => 'basket'], function() {
-    Route::post('/add/{id}', 'BasketController@basketAdd')->name('basket-add');
-    Route::post('/remove/{id}', 'BasketController@basketRemove')->name('basket-remove');
+//    Route::post('/add/{id}', 'BasketController@basketAdd')->name('basket-add'); вариант с передачей не id, а сразу объекта называется Model Injection
+    Route::post('/add/{product}', 'BasketController@basketAdd')->name('basket-add');
+//    Route::post('/remove/{id}', 'BasketController@basketRemove')->name('basket-remove');
+    Route::post('/remove/{product}', 'BasketController@basketRemove')->name('basket-remove');
     Route::group(['middleware' => 'basket_not_empty'], function() {
         Route::get('/', 'BasketController@basket')->name('basket');
         Route::get('/place', 'BasketController@basketPlace')->name('basket-place');

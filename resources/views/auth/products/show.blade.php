@@ -39,6 +39,10 @@
                 <td>Цена</td>
                 <td>{{ $product->price }}</td>
             </tr>
+            <tr>
+                <td>Количество</td>
+                <td>{{ $product->count }}</td>
+            </tr>
             {{--<tr>
                 <td>Описание en</td>
                 <td>{{ $category->description_en }}</td>

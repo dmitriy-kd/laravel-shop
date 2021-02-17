@@ -15,6 +15,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
+        // $products = $order->products()->withTrashed()->get(); - получение продуктов удаленных через soft delete
         return view('auth.orders.show', compact('order'));
     }
 }

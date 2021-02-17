@@ -28,6 +28,7 @@ class ProductRequest extends FormRequest
             'code' => 'required|min:3|max:255|unique:products,code',
             'category_id' => 'required',
             'price' => 'required|numeric|min:1',
+            'count' => 'numeric|min:0',
         ];
         return $rules;
     }
@@ -39,6 +40,7 @@ class ProductRequest extends FormRequest
             'required' => 'Поле :attribute обязательно для заполнения',
             'min' => 'Поле :attribute должно содержать минимум :min символов',
             'code.min' => 'Поле "Код" должно содержать минимально 3 символа',
+            'count.min' => 'Количество не может быть отрицательным',
         ];
     }
 }

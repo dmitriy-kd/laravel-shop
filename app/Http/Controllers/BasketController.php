@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Order;
 use App\Product;
+use App\Classes\Basket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,30 +12,33 @@ class BasketController extends Controller
 {
     public function basket()
     {
-        $orderId = session('orderId');
-        if (!is_null($orderId)) {
+        $order = (new Basket())->getOrder();
+        /*$orderId = session('orderId'); принцип DRY - вынесли поиск заказа в конструктор нашего класса Basket
+        //if (!is_null($orderId)) { проверка на отсутствия заказа происходит через middleware в basketisnotempty
             $order = Order::findOrFail($orderId);
-        }
+        //}*/
         return view('basket', compact('order'));
     }
 
     public function basketPlace()
     {
-        $orderId = session('orderId');
-        if (is_null($orderId)) {
+        $order = (new Basket())->getOrder();
+        //$orderId = session('orderId');
+        /*if (is_null($orderId)) {
             return redirect()->route('index');
-        }
-        $order = Order::find($orderId);
+        }*/
+        //$order = Order::find($orderId);
         return view('order', compact('order'));
     }
 
     public function basketConfirm(Request $request)
     {
-        $orderId = session('orderId');
-        if (is_null($orderId)) {
+        $order = (new Basket())->getOrder();
+        //$orderId = session('orderId');
+        /*if (is_null($orderId)) {
             return redirect()->route('index');
-        }
-        $order = Order::find($orderId);
+        }*/
+        //$order = Order::find($orderId);
         $success =  $order->saveOrder($request->name, $request->phone);
 
         if ($success) {
@@ -45,7 +49,7 @@ class BasketController extends Controller
         return redirect()->route('index');
     }
 
-    public function basketAdd($productId)
+    public function basketAdd(/*$productId*/ Product $product) // Model Injection если прописать ожидаемый тип как объект класса тогда с помощью магии вернется объект этого класса
     {
         $orderId = session('orderId');
         if (is_null($orderId)) {
@@ -55,12 +59,18 @@ class BasketController extends Controller
             $order = Order::find($orderId);
         }
 
-        if ($order->products->contains($productId)) {
-            $pivotRow = $order->products()->where('product_id', $productId)->first()->pivot;
+        if ($order->products->contains(/*$productId*/ $product->id)) {
+            $pivotRow = $order->products()->where('product_id', /*$productId*/ $product->id)->first()->pivot;
+
+            if (($product->count) <= ($order->products()->where('product_id', $product->id)->first()->pivot->count)) {
+                session()->flash('danger', 'Товара '. $product->name . ' больше нет в наличии');
+                return redirect()->route('basket');
+            }
+
             $pivotRow->count++;
             $pivotRow->update();
         } else {
-            $order->products()->attach($productId);
+            $order->products()->attach(/*$productId*/ $product->id);
         }
 
         if (Auth::check()) {
@@ -68,7 +78,7 @@ class BasketController extends Controller
             $order->save();
         }
 
-        $product = Product::find($productId);
+        // $product = Product::find($productId); получается благодаря тому что мы сразу передаем объект, отпадает необходимость в лишнем запросе в базу
 
         session()->flash('success', 'Товар ' . $product->name . ' добавлен в корзину');
 
@@ -76,24 +86,24 @@ class BasketController extends Controller
 //        return view('basket', compact('order')); чтобы исправить баг с тем что добавляется еще один товар после обновления нужно использовать редирект
     }
 
-    public function basketRemove($productId)
+    public function basketRemove(/*$productId*/ Product $product)
     {
         $orderId = session('orderId');
         if (is_null($orderId)) {
             return view('basket', compact('order'));
         }
         $order = Order::find($orderId);
-        if ($order->products->contains($productId)) {
-            $pivotRow = $order->products()->where('product_id', $productId)->first()->pivot;
+        if ($order->products->contains(/*$productId*/ $product->id)) {
+            $pivotRow = $order->products()->where('product_id', /*$productId*/ $product->id)->first()->pivot;
             if ($pivotRow->count < 2) {
-                $order->products()->detach($productId);
+                $order->products()->detach(/*$productId*/ $product->id);
             } else {
                 $pivotRow->count--;
                 $pivotRow->update();
             }
         }
 
-        $product = Product::find($productId);
+        // $product = Product::find($productId);
 
         session()->flash('warning', 'Товар ' . $product->name . ' был удален из корзины');
 
