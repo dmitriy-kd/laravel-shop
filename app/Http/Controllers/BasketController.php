@@ -42,6 +42,12 @@ class BasketController extends Controller
         $success =  $order->saveOrder($request->name, $request->phone);
 
         if ($success) {
+            foreach ($order->products as $product)
+            {
+                $newCountOfProduct = Product::findOrFail($product->id)->count - $product->getOriginal('pivot_count');
+                $product->update(['count' => $newCountOfProduct]);
+            }
+
             session()->flash('success', 'Ваш заказ оформлен');
         } else {
             session()->flash('warning', 'Произошла ошибка при оформлении заказа');
