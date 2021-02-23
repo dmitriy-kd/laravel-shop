@@ -49,6 +49,8 @@ Route::middleware(['auth'])->group(function() {
 
 Route::get('/', 'MainController@index')->name('index');
 
+Route::post('/subscription/{product}', 'MainController@subscribe')->name('subscription');
+
 Route::get('/categories', 'MainController@categories')->name('categories');
 
 Route::get('/card/{card}', 'MainController@card')->name('card');

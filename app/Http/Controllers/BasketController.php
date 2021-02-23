@@ -7,6 +7,8 @@ use App\Product;
 use App\Classes\Basket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderCreated;
 
 class BasketController extends Controller
 {
@@ -33,6 +35,7 @@ class BasketController extends Controller
 
     public function basketConfirm(Request $request)
     {
+        $email = Auth::check() ? Auth::user()->email : $request->email;
         $order = (new Basket())->getOrder();
         //$orderId = session('orderId');
         /*if (is_null($orderId)) {
@@ -47,7 +50,7 @@ class BasketController extends Controller
                 $newCountOfProduct = Product::findOrFail($product->id)->count - $product->getOriginal('pivot_count');
                 $product->update(['count' => $newCountOfProduct]);
             }
-
+            Mail::to($email)->send(new OrderCreated($request->name, $order));
             session()->flash('success', 'Ваш заказ оформлен');
         } else {
             session()->flash('warning', 'Произошла ошибка при оформлении заказа');
@@ -69,7 +72,7 @@ class BasketController extends Controller
             $pivotRow = $order->products()->where('product_id', /*$productId*/ $product->id)->first()->pivot;
 
             if (($product->count) <= ($order->products()->where('product_id', $product->id)->first()->pivot->count)) {
-                session()->flash('danger', 'Товара '. $product->name . ' больше нет в наличии');
+                session()->flash('warning', 'Товара '. $product->name . ' больше нет в наличии');
                 return redirect()->route('basket');
             }
 

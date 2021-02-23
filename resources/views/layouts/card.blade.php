@@ -22,7 +22,8 @@
                     @csrf
                 </form>
             @else
-                <button class="btn btn-default">Нет в наличии</button>
+{{--                <button class="btn btn-default">Нет в наличии</button>--}}
+                Не доступен
             @endif
             <a href="{{ route('product', [isset($category) ? $category->code : $product->category->code, $product->code]) }}"
                class="btn btn-default"
