@@ -19,19 +19,19 @@
             <div class="col-sm-2 col-md-2">
                 <label for="hit">
                     <input type="checkbox" name="hit" id="hit" @if(request()->has('hit')) checked @endif>
-                    Хит
+                    @lang('main.properties.hit')
                 </label>
             </div>
             <div class="col-sm-2 col-md-2">
                 <label for="new">
                     <input type="checkbox" name="new" id="new" @if(request()->has('new')) checked @endif>
-                    Новинка
+                    @lang('main.properties.new')
                 </label>
             </div>
             <div class="col-sm-2 col-md-2">
                 <label for="recommend">
                     <input type="checkbox" name="recommend" id="recommend" @if(request()->has('recommend')) checked @endif>
-                    Рекомендуем
+                    @lang('main.properties.recommend')
                 </label>
             </div>
             <div class="col-sm-6 col-md-3">

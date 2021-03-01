@@ -1,6 +1,6 @@
 <p>Уважаемый {{ $name }}</p>
 
-<strong>Ваш заказ №{{ $orderId }} на сумму: {{ $orderSum }} создан</strong>
+<strong>@lang('mail.order_created.your_order') №{{ $orderId }} на сумму: {{ $orderSum }} создан</strong>
 
 <p>Список товаров:</p>
 

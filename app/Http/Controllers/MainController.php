@@ -8,6 +8,7 @@ use App\Http\Requests\SubscriptionRequest;
 use App\Product;
 use App\Subscription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
 class MainController extends Controller
@@ -71,6 +72,18 @@ class MainController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'На указанную почту придет уведомление при поступлении товара');
+    }
+
+    public function changeLocale($locale)
+    {
+        $availableLocales = ['en', 'ru'];
+        if (!in_array($locale, $availableLocales)) {
+            $locale = config('app.locale');
+        }
+        session(['locale' => $locale]);
+        App::setLocale($locale);
+        $currentLocale = App::getLocale();
+        return redirect()->back();
     }
 
 }
