@@ -27,10 +27,10 @@
                 <td>Название</td>
                 <td>{{ $product->name }}</td>
             </tr>
-            {{--<tr>
+            <tr>
                 <td>Название en</td>
-                <td>{{ $category->name_en }}</td>
-            </tr>--}}
+                <td>{{ $product->name_en }}</td>
+            </tr>
             <tr>
                 <td>Описание</td>
                 <td>{{ $product->description }}</td>
@@ -43,10 +43,10 @@
                 <td>Количество</td>
                 <td>{{ $product->count }}</td>
             </tr>
-            {{--<tr>
+            <tr>
                 <td>Описание en</td>
-                <td>{{ $category->description_en }}</td>
-            </tr>--}}
+                <td>{{ $product->description_en }}</td>
+            </tr>
             <tr>
                 <td>Категория</td>
                 <td>{{ $product->category->name }}</td>

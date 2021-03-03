@@ -7,7 +7,7 @@
     <h2> {{ $product->category->name }}</h2>
     <p>Цена: <b>{{ $product->price }} ₽</b></p>
     <img src="{{ Storage::url($product->image) }}">
-    <p>{{ $product->description }}</p>
+    <p>{{ $product->__('description') }}</p>
     @if ($product->isAvailable())
         <form action="{{ route('basket-add', $product->id) }}" method="POST">
             <button type="submit" class="btn btn-success" role="button">В корзину</button>

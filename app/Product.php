@@ -3,11 +3,13 @@
 namespace App;
 
 use App\Category;
+use App\Traits\Translatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
+    use Translatable;
 
     //use SoftDeletes; // использование трейтов
     //protected $table = 'product'; //переопределение к какой таблице относится модель
@@ -21,7 +23,9 @@ class Product extends Model
         'new',
         'hit',
         'recommend',
-        'count'
+        'count',
+        'name_en',
+        'description_en',
     ];
     /*public function getCategory()
     {

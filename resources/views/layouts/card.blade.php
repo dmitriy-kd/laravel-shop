@@ -13,7 +13,7 @@
         </div>
         <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}">
         <div class="caption">
-            <h3><a href="#">{{ $product->name }}</a></h3>
+            <h3><a href="#">{{ $product->__('name') }}</a></h3>
             <p>{{ $product->price }} ₽</p>
             <p>
             @if ($product->isAvailable())
