@@ -8,8 +8,8 @@
     <title>@lang('main.online_shop'): @yield('title')</title>
 
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-{{--    <script src="/js/jquery.min.js"></script>--}}
-{{--    <script src="/js/bootstrap.min.js"></script>--}}
+    {{--    <script src="/js/jquery.min.js"></script>--}}
+    {{--    <script src="/js/bootstrap.min.js"></script>--}}
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/starter-template.css" rel="stylesheet">
 </head>
@@ -25,15 +25,21 @@
                 <li @routeactive('categor*')><a href="{{ route('categories') }}">Категории</a>
                 </li>
                 <li @routeactive('basket')><a href="{{ route('basket') }}">В корзину</a></li>
-{{--                <li><a href="http://internet-shop.tmweb.ru/reset">Сбросить проект в начальное состояние</a></li>--}}
-                <li><a href="{{ route('locale', __('main.set_lang')) }}">Переключить язык на (@lang('main.set_lang'))</a></li>
+                {{--                <li><a href="http://internet-shop.tmweb.ru/reset">Сбросить проект в начальное состояние</a></li>--}}
+                <li><a href="{{ route('locale', __('main.set_lang')) }}">Переключить язык на (@lang('main.set_lang')
+                        )</a></li>
 
                 <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">₽<span class="caret"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">Выбор валюты ({{ \App\Services\CurrencyConversion::getCurrencySymbol() }})<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="http://internet-shop.tmweb.ru/currency/RUB">₽</a></li>
-                        <li><a href="http://internet-shop.tmweb.ru/currency/USD">$</a></li>
-                        <li><a href="http://internet-shop.tmweb.ru/currency/EUR">€</a></li>
+                        @foreach(\App\Services\CurrencyConversion::getCurrencies() as $currency)
+                            @if($currency->is_main == 1)
+                                <li class="dropdown-header">Главная валюта</li>
+                            @endif
+                            <li><a href="{{ route('currency', $currency->code) }}">{{ $currency->symbol }}</a></li>
+                            <li role="separator" class="divider"></li>
+                        @endforeach
                     </ul>
                 </li>
             </ul>
@@ -44,10 +50,10 @@
                 @endguest
                 @auth
                     @admin
-                            <li><a href="{{ route ('home') }}">Панель администратора</a></li>
-                        @else
-                            <li><a href="{{ route('person.orders.index') }}">Личный кабинет</a></li>
-                        @endadmin
+                    <li><a href="{{ route ('home') }}">Панель администратора</a></li>
+                @else
+                    <li><a href="{{ route('person.orders.index') }}">Личный кабинет</a></li>
+                    @endadmin
                     <li><a href="{{ route('get-logout') }}">Выйти</a></li>
                 @endauth
             </ul>
@@ -58,12 +64,19 @@
 <div class="container">
     <div class="starter-template">
         @if(session()->has('success'))
-        <p class="alert alert-success">{{ session()->get('success') }}</p>
-            @elseif(session()->has('warning'))
+            <p class="alert alert-success">{{ session()->get('success') }}</p>
+        @elseif(session()->has('warning'))
             <p class="alert alert-warning">{{ session()->get('warning') }}</p>
         @endif
         @yield('content')
     </div>
 </div>
+<script
+    src="https://code.jquery.com/jquery-1.12.4.js"
+    integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous"></script>
 </body>
 </html>

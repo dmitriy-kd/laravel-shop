@@ -14,7 +14,7 @@
         <img src="{{ Storage::url($product->image) }}" alt="{{ $product->name }}">
         <div class="caption">
             <h3><a href="#">{{ $product->__('name') }}</a></h3>
-            <p>{{ $product->price }} ₽</p>
+            <p>{{ $product->price }} {{ \App\Services\CurrencyConversion::getCurrencySymbol() }}</p>
             <p>
             @if ($product->isAvailable())
                 <form action="{{ route('basket-add', $product->id) }}" method="POST" style="display:inline-block">
