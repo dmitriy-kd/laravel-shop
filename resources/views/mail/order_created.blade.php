@@ -17,7 +17,7 @@
                 {{ $product->name }}
             </td>
             <td>
-                {{ $product->pivot->count }}
+                {{ $product->countInOrder }}
             </td>
             <td>
                 {{ $product->price }}

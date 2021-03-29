@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
+    protected $fillable = ['user_id', 'currency_id', 'sum'];
     public function products()
     {
-        return $this->belongsToMany(Product::class)->withPivot('count')->withTimestamps();
+        return $this->belongsToMany(Product::class)->withPivot(['count', 'price'])->withTimestamps();
     }
 
 /*    public function user()
@@ -17,13 +18,30 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }*/
 
-    public function getFullPrice()
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
+    }
+
+    public function calculateFullSum()
     {
         $sum = 0;
         foreach ($this->products as $product) {
             $sum += $product->getPriceForCount();
         }
         return $sum;
+    }
+
+    public function getFullSum()
+    {
+        $sum = 0;
+
+        foreach ($this->products as $product) {
+            $sum += $product->price * $product->countInOrder;
+        }
+
+        return $sum;
+//        return session('full_order_sum', 0);
     }
 
     public function scopeActive($query)
@@ -33,15 +51,23 @@ class Order extends Model
 
     public function saveOrder($name, $phone)
     {
-        if ($this->status == 0) {
             $this->name = $name;
             $this->phone = $phone;
             $this->status = 1;
+            $this->sum = $this->getFullSum();
+
+            $products = $this->products;
             $this->save();
-            session()->forget('orderId');
+
+            foreach ($products as $productInOrder)
+            {
+                $this->products()->attach($productInOrder, [
+                    'count' => $productInOrder->countInOrder,
+                    'price' => $productInOrder->price,
+                ]);
+            }
+            session()->forget('order');
             return true;
-        }
-        return false;
 
     }
 }

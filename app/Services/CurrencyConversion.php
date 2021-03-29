@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 
 class CurrencyConversion
 {
+    const DEFAULT_CURRENCY_CODE = 'RUB';
     protected static $container;
 
     public static function loadContainer()
@@ -27,32 +28,38 @@ class CurrencyConversion
         return self::$container;
     }
 
-    public static function convert($sum, $originCurrencyCode = 'RUB', $targetCurrencyCode = null)
+    public static function convert($sum, $originCurrencyCode = self::DEFAULT_CURRENCY_CODE, $targetCurrencyCode = null)
     {
         self::loadContainer();
 //        $originCurrency = Currency::byCode($originCurrencyCode)->firstOrFail(); для сокращения кол-ва запросов к бд
         // на получения текущего кода валюты и тд, мы сразу создаем "контейнер" где будем хранить уже готовые значения
         $originCurrency = self::$container[$originCurrencyCode];
 
-        if ($originCurrency->updated_at->startOfDay()->toString() !== Carbon::now()->startOfDay()->toString())
+        if ($originCurrency->code != self::DEFAULT_CURRENCY_CODE)
         {
-            CurrencyRates::getRates();
-            self::loadContainer();
-            $originCurrency = self::$container[$originCurrencyCode];
+            if ($originCurrency->rate == 0 || $originCurrency->updated_at->startOfDay()->toString() !== Carbon::now()->startOfDay()->toString())
+            {
+                CurrencyRates::getRates();
+                self::loadContainer();
+                $originCurrency = self::$container[$originCurrencyCode];
+            }
         }
 
         if (is_null($targetCurrencyCode)) {
-            $targetCurrencyCode = session('currency', 'RUB');
+            $targetCurrencyCode = session('currency', self::DEFAULT_CURRENCY_CODE);
         }
 
 //        $targetCurrency = Currency::byCode($targetCurrencyCode)->firstOrFail();
         $targetCurrency = self::$container[$targetCurrencyCode];
 
-        if ($targetCurrency->updated_at->startOfDay()->toString() !== Carbon::now()->startOfDay()->toString())
+        if ($targetCurrency->code != self::DEFAULT_CURRENCY_CODE)
         {
-            CurrencyRates::getRates();
-            self::loadContainer();
-            $targetCurrency = self::$container[$targetCurrencyCode];
+            if ($targetCurrency->rate == 0 || $targetCurrency->updated_at->startOfDay()->toString() !== Carbon::now()->startOfDay()->toString())
+            {
+                CurrencyRates::getRates();
+                self::loadContainer();
+                $targetCurrency = self::$container[$targetCurrencyCode];
+            }
         }
 
         return $sum / $originCurrency->rate * $targetCurrency->rate;
@@ -62,7 +69,7 @@ class CurrencyConversion
     {
 //        return Currency::byCode(session('currency', 'RUB'))->firstOrFail()->symbol;
         self::loadContainer();
-        $currencyFromSession = session('currency', 'RUB');
+        $currencyFromSession = self::getCurrencyFromSession();
         return self::$container[$currencyFromSession]->symbol;
     }
 
@@ -72,6 +79,24 @@ class CurrencyConversion
         foreach (self::$container as $code => $currency)
         {
             if ($currency->isMain())
+            {
+                return $currency;
+            }
+        }
+    }
+
+    public static function getCurrencyFromSession()
+    {
+        return session('currency', self::DEFAULT_CURRENCY_CODE);
+    }
+
+    public static function getCurrentCurrencyFromSession()
+    {
+        self::loadContainer();
+        $currencyCode = self::getCurrencyFromSession();
+        foreach (self::$container as $currency)
+        {
+            if ($currency->code === $currencyCode)
             {
                 return $currency;
             }
